@@ -1,0 +1,19 @@
+{
+  "name": "pi-double-escape-clear",
+  "version": "1.0.0",
+  "description": "Double-escape to clear editor + /restore command",
+  "keywords": ["pi-package"],
+  "main": "extensions/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "publish:beta": "npm publish --tag beta"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "pi": {
+    "extensions": ["./extensions"]
+  }
+}
