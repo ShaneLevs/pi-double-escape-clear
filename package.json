@@ -1,9 +1,18 @@
 {
   "name": "pi-double-escape-clear",
-  "version": "1.1.1",
-  "description": "Double-escape to clear editor + /restore command",
+  "version": "1.1.2",
+  "description": "Pi coding agent extension — double-press Escape to clear the editor without aborting a running task, plus /restore to bring back past prompts",
   "keywords": [
-    "pi-package"
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "pi-extension",
+    "extension",
+    "escape",
+    "double-escape",
+    "editor",
+    "clear",
+    "interrupt"
   ],
   "main": "extensions/index.ts",
   "scripts": {
