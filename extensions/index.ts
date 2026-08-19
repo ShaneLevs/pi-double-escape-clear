@@ -21,6 +21,8 @@ const CLEAR_TIMEOUT_MS = 300;
 
 class DoubleEscapeClearEditor extends CustomEditor {
   private lastEscapeTime = 0;
+  private pendingEscapeTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingEscapeData: string | null = null;
 
   handleInput(data: string): void {
     if (matchesKey(data, Key.escape)) {
@@ -28,26 +30,64 @@ class DoubleEscapeClearEditor extends CustomEditor {
       const timeSinceLast = now - this.lastEscapeTime;
       const currentText = this.getText().trim();
 
-      // Double-escape while editor has content: save to history, then clear
+      // Double-escape while editor has content: save to history, then clear.
+      // Neither escape is forwarded to super here: forwarding the first escape
+      // triggers pi's native `app.interrupt` binding (Escape = cancel/abort),
+      // which terminates a running task before the second escape can arrive
+      // (this was the Windows behavior).
       if (
         timeSinceLast < CLEAR_TIMEOUT_MS &&
         this.lastEscapeTime !== 0 &&
         currentText.length > 0
       ) {
+        this.cancelPendingEscape();
         this.lastEscapeTime = 0;
         this.addToHistory(currentText);
         this.setText("");
         return;
       }
 
-      // First escape: pass through so native double-escape (empty editor) logic works
       this.lastEscapeTime = now;
-      super.handleInput(data);
+
+      if (currentText.length > 0) {
+        // First escape with content: hold it for the double-press window. If a
+        // second escape arrives we clear above and never forward; if not, the
+        // held escape is forwarded after the window so native behavior (abort
+        // a running task, session tree on empty editor, etc.) still works.
+        this.holdEscape(data);
+      } else {
+        // Empty editor: forward immediately so native double-escape
+        // (session tree / fork) works untouched.
+        super.handleInput(data);
+      }
       return;
     }
 
+    // Any other key cancels a pending first-escape hold.
+    this.cancelPendingEscape();
     this.lastEscapeTime = 0;
     super.handleInput(data);
+  }
+
+  private holdEscape(data: string): void {
+    this.cancelPendingEscape();
+    this.pendingEscapeData = data;
+    this.pendingEscapeTimer = setTimeout(() => {
+      this.pendingEscapeTimer = null;
+      const escaped = this.pendingEscapeData;
+      this.pendingEscapeData = null;
+      if (escaped !== null) {
+        super.handleInput(escaped);
+      }
+    }, CLEAR_TIMEOUT_MS);
+  }
+
+  private cancelPendingEscape(): void {
+    if (this.pendingEscapeTimer !== null) {
+      clearTimeout(this.pendingEscapeTimer);
+      this.pendingEscapeTimer = null;
+    }
+    this.pendingEscapeData = null;
   }
 }
 
@@ -58,7 +98,7 @@ function getUserMessages(entries: SessionMessageEntry[]): Array<{ id: string; te
   for (const entry of entries) {
     const msg = entry.message as { role?: string; content?: unknown };
     if (msg.role !== "user") continue;
-    const text = contentText(msg.content as string | Array<unknown>, "\n");
+    const text = contentText(msg.content as Parameters<typeof contentText>[0], "\n");
     if (!text.trim()) continue;
     results.push({ id: entry.id, text });
   }
