@@ -2,6 +2,16 @@
   "name": "pi-double-escape-clear",
   "version": "1.1.3",
   "description": "Pi coding agent extension — double-press Escape to clear the editor without aborting a running task, plus /restore to bring back past prompts",
+  "license": "MIT",
+  "author": "shanelevs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShaneLevs/pi-double-escape-clear.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShaneLevs/pi-double-escape-clear/issues"
+  },
+  "homepage": "https://github.com/ShaneLevs/pi-double-escape-clear#readme",
   "keywords": [
     "pi-package",
     "pi",
@@ -17,16 +27,24 @@
   "main": "extensions/index.ts",
   "scripts": {
     "build": "tsc --noEmit",
+    "test": "bun test",
+    "prepublishOnly": "npm run build",
     "publish:beta": "npm publish --tag beta"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*",
     "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
     "@earendil-works/pi-tui": "*"
   },
   "pi": {
     "extensions": [
       "./extensions"
     ]
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "^0.84.4",
+    "@earendil-works/pi-coding-agent": "^0.84.4",
+    "@earendil-works/pi-tui": "^0.84.4",
+    "typescript": "^5.8.3"
   }
 }
