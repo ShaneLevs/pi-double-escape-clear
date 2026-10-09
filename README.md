@@ -1,5 +1,8 @@
 # pi-double-escape-clear
 
+[![npm version](https://img.shields.io/npm/v/pi-double-escape-clear.svg)](https://www.npmjs.com/package/pi-double-escape-clear)
+[![pi package](https://img.shields.io/badge/pi-package-8A2BE2.svg)](https://pi.dev/packages/pi-double-escape-clear)
+
 为 pi coding agent 提供 **双击 ESC 快速清空输入** + **`/restore` 找回历史消息** 的扩展插件。
 
 ---
